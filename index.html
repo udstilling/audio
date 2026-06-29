@@ -1,116 +1,100 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="da">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lyd</title>
-  <style>
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background: #f6f1e8;
-      color: #111;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    body {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    main {
-      width: min(620px, 100%);
-      text-align: center;
-    }
-    .speaker {
-      font-size: clamp(110px, 32vw, 220px);
-      line-height: 1;
-      margin-bottom: 28px;
-    }
-    button {
-      width: 100%;
-      min-height: 130px;
-      border: 0;
-      border-radius: 999px;
-      background: #111;
-      color: white;
-      font-size: clamp(36px, 12vw, 76px);
-      font-weight: 900;
-      letter-spacing: .02em;
-      box-shadow: 0 12px 35px rgba(0,0,0,.22);
-      cursor: pointer;
-    }
-    button:active { transform: scale(.985); }
-    .hint {
-      margin-top: 26px;
-      color: #555;
-      font-size: 20px;
-    }
-    audio {
-      width: 100%;
-      margin-top: 28px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lyd</title>
+
+<style>
+body{
+    margin:0;
+    background:#f5f1e8;
+    font-family:Arial,Helvetica,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    width:90%;
+    max-width:600px;
+    text-align:center;
+}
+
+button{
+    width:100%;
+    padding:30px;
+    font-size:42px;
+    font-weight:bold;
+    border:none;
+    border-radius:100px;
+    background:#111;
+    color:white;
+    cursor:pointer;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+.speaker{
+    font-size:140px;
+    margin-bottom:20px;
+}
+
+audio{
+    width:100%;
+    margin-top:25px;
+}
+</style>
+
 </head>
 <body>
-  <main>
-    <div class="speaker" aria-hidden="true">🔊</div>
-    <button id="playButton" type="button" aria-label="Afspil lyd">AFSPIL</button>
-    <p id="hint" class="hint">Scanner du QR-koden, forsøger lyden at starte automatisk.</p>
-    <audio id="audio" controls preload="auto"></audio>
-  </main>
 
-  <script>
-    const audio = document.getElementById("audio");
-    const playButton = document.getElementById("playButton");
-    const hint = document.getElementById("hint");
+<div class="container">
 
-    function getNumber() {
-      const path = window.location.pathname.replace(/\/$/, "");
-      const last = path.split("/").pop();
+<div class="speaker">🔊</div>
 
-      if (/^\d+$/.test(last)) return last;
+<button id="playButton">AFSPIL</button>
 
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get("id") || params.get("lyd") || params.get("audio");
-      if (/^\d+$/.test(id || "")) return id;
+<audio id="audio" controls></audio>
 
-      return "1";
-    }
+</div>
 
-    const number = getNumber();
-    audio.src = `audio/${number}.mp3`;
+<script>
 
-    async function play() {
-      try {
+const params = new URLSearchParams(window.location.search);
+
+const id = params.get("id") || "1";
+
+const audio = document.getElementById("audio");
+
+audio.src = "audio/" + id + ".mp3";
+
+const button = document.getElementById("playButton");
+
+async function playAudio(){
+
+    try{
+
         await audio.play();
-        playButton.textContent = "SPILLER";
-        hint.textContent = "";
-      } catch (e) {
-        playButton.textContent = "AFSPIL";
-        hint.textContent = "Tryk på den store knap for at høre lyden.";
-      }
+
+        button.innerText="SPILLER";
+
+    }catch(e){
+
+        button.innerText="AFSPIL";
+
     }
 
-    playButton.addEventListener("click", play);
+}
 
-    audio.addEventListener("play", () => {
-      playButton.textContent = "SPILLER";
-      hint.textContent = "";
-    });
+button.onclick = playAudio;
 
-    audio.addEventListener("pause", () => {
-      if (!audio.ended) playButton.textContent = "FORTSÆT";
-    });
+playAudio();
 
-    audio.addEventListener("ended", () => {
-      playButton.textContent = "AFSPIL IGEN";
-      hint.textContent = "";
-    });
+</script>
 
-    // Forsøg autoplay. iPhone/Safari kræver ofte ét tryk.
-    play();
-  </script>
 </body>
 </html>
